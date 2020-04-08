@@ -14,7 +14,7 @@ public:
 		char temp;
 		FILE* input = fopen(_fileName, "r");
 		
-		while(fscanf(input, " %c", &temp) != EOF)
+		while(fscanf(input, "%c\n", &temp) != EOF)
 		{
 			s1.push_back(temp);
 		}
