@@ -2,27 +2,29 @@
 #include<vector>
 #include<queue>
 
-//knight의 좌표
+/*coordinates of knights*/
 typedef struct
 {
-	int x, y;
+	int x; //vertical
+	int y; //horizontal
 }Pos;
 
 class InputData
 {
 public:
-	int n=0; //보드판의 크기 (n x n)
-	std::vector<std::vector<int>> chess; //체스판 할당
+	int n=0; //size of board
+	std::vector<std::vector<int>> chess; //allocate board
 
-	Pos s = { 0,0 }; //시작 위치 start
-	Pos d = { 0,0 }; //도착 위치 destination
-	Pos mov[8] = { {-2,-1}, {-2,1}, {-1,-2}, {-1,2}, {1,-2}, {1,2}, {2,-1}, {2,1} };
-	/*input.txt 읽어서 좌표 저장하기*/
+	Pos s = { 0,0 }; //starting point
+	Pos d = { 0,0 }; //destination
+	Pos mov[8] = { {-2,-1}, {-2,1}, {-1,-2}, {-1,2}, {1,-2}, {1,2}, {2,-1}, {2,1} }; //the direction of the knight can move
+	
 	void input(const char* _fileName)
 	{
 		FILE* input = fopen(_fileName, "r");
 		fscanf(input, "%d", &n);
-		/* n x n 체스판 생성, 현재 0으로 초기화 */
+		
+		//make n x n chess board*/
 		for (int i = 0; i < n; i++)
 		{
 			std::vector<int>element(n);
@@ -33,50 +35,48 @@ public:
 
 		fclose(input);
 	}
-
 };
 
+/*find the minimum number of steps taken by a Knight to reach, 'starting point'->'destination'*/
 int BFS(InputData& _i)
 {
 	std::queue<std::pair<int, Pos>> q;
 	int cnt = 0;
 	q.push(std::make_pair(cnt, _i.s));
-	_i.chess[_i.s.x][_i.s.y]++; //시작점은 이미 방문한 것이므로 +1 해준다.
+	_i.chess[_i.s.x][_i.s.y]++;
 
-	/*큐가 빌때까지*/
 	while (!q.empty())
 	{
 		int x = q.front().second.x;
 		int y = q.front().second.y;
-		int cnt = q.front().first;;
+		int step = q.front().first;;
 		q.pop();
 
-		/*도착지점에 도달했으면 이동횟수 출력*/
+		/*when arrived at destination, return nummber of steps*/
 		if (x == _i.d.x && y == _i.d.y)
 		{
-			printf("최소이동횟수: %d\n", cnt);
-			return cnt;
+			return step;
 		}
-		/*8개 방향으로 이동 진행*/
+		/*Knights can move 8 directions*/
 		for (int i = 0; i < 8; i++)
 		{
 			int nx = x + _i.mov[i].x;
 			int ny = y + _i.mov[i].y;
 
-			if (0 <= nx && nx < _i.n && 0 <= ny && ny < _i.n) //체스판 내에서만 이동한다.
+			if (0 <= nx && nx < _i.n && 0 <= ny && ny < _i.n) //move in n x n
 			{
-				if (_i.chess[nx][ny] != 1) //방문한 적이 없으면
+				if (_i.chess[nx][ny] != 1)
 				{
-					q.push(std::make_pair(cnt + 1, Pos{ nx, ny }));
+					q.push(std::make_pair(step + 1, Pos{ nx, ny }));
 					_i.chess[nx][ny]++;
 				}
 			}
 		}
 	}
-	return -1;
+	return -1; //if the destination is unreachable return '-1'
 }
 
-
+/*Main Function*/
 int main(int argc, char** argv)
 {
 	InputData i;
